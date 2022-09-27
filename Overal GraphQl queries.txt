@@ -1,0 +1,174 @@
+import { useLazyQuery, useMutation, useQuery, ApolloQueryResult } from "@apollo/client";
+    HYI: Through out Graphql we used most and commonly above 3 quesries (useLazyQuery, useMutation, useQuery) only
+
+useLazyQuery examples:
+----------------------
+import { Notifications } from "utils/graphql/Notifications";
+import { NotificationMetrics } from "utils/graphql/NotificationMetrics";
+import { GET_NOTIFICATIONS, GET_NOTIFICATIONS_METRICS, GET_CONTENT_SUGGESTION, GET_CONTENT_LIST } from "utils/queries";
+import { isRequiredArgument, VariablesAreInputTypesRule } from "graphql";
+import { Settings } from "@material-ui/icons";
+
+EX-1:   const [loadNotifications, { data: notificationResult }] = useLazyQuery<Notifications>(GET_NOTIFICATIONS);
+
+EX-2:   const [loadNotificationMetrics, { data: notificationMetrics }] = useLazyQuery<NotificationMetrics>(GET_NOTIFICATIONS_METRICS, 
+            { variables: { pathwayId: id }});
+
+EX-3:   const [search, { loading: isUserLoading, data: contentList, refetch }] = useLazyQuery<any>(GET_CONTENT_SUGGESTION);
+
+        useEffect(() => {
+          loadNotifications() 
+          loadNotificationMetrics()
+          search()
+        }, []);
+
+Note1: Calling the above functions (loadNotifications(), loadNotificationMetrics(), search()) to make a query as soon as page loaded.
+Note2: We are storing api/query response at notificationResult, notificationMetrics to use at component lvl
+
+
+EX-4:   const [fetchPathway, { loading: pathwayLoading, data: pathway, refetch: pathwayRefetch }] = useLazyQuery<ContainerContentTypes.ContentContainer>(GET_CONTENT_LIST, {
+            variables: param,
+            notifyOnNetworkStatusChange: true,
+            fetchPolicy: "no-cache",
+          });
+
+          useEffect(() => {
+            fetchPathway({
+              param: {
+                parentId: id,
+                parentType: "Pathway"
+            })
+          }, [id, fetchPathway]);
+
+Note: Calling the above functions (fetchPathway()) to make a query as soon as page loaded and setting the required params as per the reqery
+
+        const handleEnroll = () => {
+          setTimeout(() => {
+            try {
+              pathwayRefetch();
+            } catch (err) {
+              console.log('error', err)
+            }
+          }, 5000)
+        }
+        <button onClick={handleEnroll}>REFETCH DATA</button>
+
+Note: Calling the above functions (pathwayRefetch()) to refetch/remake the query based on requiremnt.
+  
+  
+  
+
+
+useMutation examples:
+----------------------
+import { SKIP_SURVEY, SEND_REMINDER } from "utils/queries";
+  
+EX-1:    const [skipSurvey] = useMutation(SKIP_SURVEY);
+         const handleSkipSurvey = () => {skipSurvey({ variables: { surveyId: data?.userContext?.surveyId } })};
+
+         <button onClick={handleSkipSurvey}>SUBMIT VARIABLES WHEN WE NEED TO UPDATE IN A QUERY</button>
+
+Note: Using useMutation query to update the varibales in a query.
+
+  
+EX-2:   const [sendNotification] = useMutation(SEND_REMINDER);
+        const sendReminder = () => {sendNotification({
+          variables: {
+            overdueReminderRequest: {
+              learnerId: learnerId,
+              contentId: contentId,
+              contentType: contentType,
+              contentTitle: contentTitle,
+              dueDate: dueDate
+            }
+          }
+        }).then(() => {
+            dispatch({
+              type: "alert/show",
+              payload: { type: "success",title: t('remind_counselee'),message: t('remind_counselee_success')},
+            });
+        }).catch(() => {
+            dispatch({
+              type: "alert/show",
+              payload: {type: "error", title: t('remind_counselee'), message: t('remind_counselee_error')},
+            });
+        });
+
+
+
+
+
+useQuery examples:
+----------------------
+import { PLAYLISTS, GET_LEARNER_METRICS, GET_SAS, GET_OPENSESAME_LAUNCH_PARAMS, GET_COURSE_BY_ID, GET_CONTENT_LIST } from "utils/queries";
+import { PlaylistTypes } from "utils/graphql/PlaylistTypes";
+import { LearnersMetricsTypes } from "utils/graphql/LearnersMetricsTypes";
+import { SasTypes } from "utils/graphql/SasTypes";
+import { OpenSesameLaunchParameters } from "utils/graphql/OpenSesameLaunchParameters";
+import { CourseTypes } from "utils/graphql/CourseTypes";
+import { ContainerContentTypes } from "utils/graphql/ContainerContentTypes";
+
+EX-1:  const { data, loading } = useQuery<PlaylistTypes.Playlist>(PLAYLISTS);
+
+EX-2:  const { data: metricsList} = useQuery<LearnersMetricsTypes.LearnersMetrics>(GET_LEARNER_METRICS, {fetchPolicy: "no-cache"});
+
+EX-3:  const { data: sasData} = useQuery<SasTypes.SAS>(GET_SAS, {
+          variables: {parameters: { programmeId: courseId, activityId: activityId }},
+       });
+
+EX-4:  const { loading, error, data } = useQuery<OpenSesameLaunchParameters.OpenSesameLaunchParameters>(GET_OPENSESAME_LAUNCH_PARAMS,
+          {
+            variables: { courseId: props.courseId, activityId: props.activityId },
+            onCompleted: () => { props.dataLoaded?.(false) }
+          }
+       );
+
+EX-5:   const {loading: courseLoading, data: courses refetch: courseDetailsRefetch } = useQuery<CourseTypes.Course>(GET_COURSE_BY_ID, {
+            fetchPolicy: "no-cache",
+            variables: {
+              courseId: id,
+            },
+        });
+
+EX-6:  const { loading: channelLoading, data: channel, refetch: handleChannelRefetch } = useQuery<ContainerContentTypes.ContentContainer>(GET_CONTENT_LIST, {
+          variables: param,
+          notifyOnNetworkStatusChange: true,
+          fetchPolicy: "no-cache",
+       });
+
+       useEffect(() => {
+          const param = {
+            parentId: id,
+            parentType,
+            sort: parseSortType(selectedSort),
+          }
+       }
+       <button onClick={handleChannelRefetch()}>REFETCH DATA</button>
+
+
+Note-1: In useQery we don't have any function to call to make a query, it will always make the query it self, no need to invoke any function call.
+Note-2: In useQery refetch will work same as useLazyQuery.
+
+
+
+
+
+  
+  
+
+	
+	
+  
+  
+  
+ 
+  
+  
+ 
+
+	 
+  
+    
+  
+  
+   

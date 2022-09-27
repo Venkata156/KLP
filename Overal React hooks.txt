@@ -1,0 +1,77 @@
+React Hooks:
+------------
+import React, { useState, useEffect, useRef, useMemo, useCallback, ReactChild, FormEvent, MouseEvent} from "react"; 
+import { CSSProperties, useLayoutEffect, cloneElement, FC, ChangeEvent } from "react";
+import { ReactComponent as arrowIcon } from "assets/icons/icon-arrow.svg";
+import { useTranslation } from "react-i18next";
+import sanitizeHtml from "sanitize-html";
+
+const { t } = useTranslation();
+{t('questionare_confirmation_add_skills')}
+
+const [titleIcon, setTitleIcon] = useState<string | null>(null);
+const formEl = React.useRef<HTMLFormElement>(null);
+
+FormEvent Ex: const handleSubmit = (event: FormEvent) => {event.preventDefault()};
+              <form noValidate onSubmit={handleSubmit}></form>
+
+EmailValidation Regx:  export const emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+useMemo ex:  const params = useParams();
+             const activityId = useMemo(() => {
+              return get(params, "activityId", "-1");
+            }, [params]);
+
+
+
+
+REACT-REDUX:
+-----------
+import { useSelector, useAppDispatch } from "react-redux";
+import { RootState } from "store";
+import { createAction, createReducer } from "@reduxjs/toolkit";
+
+const userContext = useSelector((state: RootState) => state.core.userContext.userContext);
+const initialSearchTerm = useSelector((state: RootState) => state.core.searchText);
+
+const dispatch = useAppDispatch();
+dispatch(setPageButton(true));
+
+
+
+
+REACT ROUTER:
+------------
+import { Link, Route, Switch, Redirect, useHistory, useParams, useLocation, Prompt } from "react-router-dom";
+import { cloneDeep, debounce, get, noop, range, isUndefined } from "lodash";
+
+const params = useParams();
+const history = useHistory();
+const location = useLocation();
+
+history.push("/attendance-confirmation");
+location.pathname !== "/attendance-confirmation"
+if (location.pathname !== "/") {
+  history.push("/");
+}
+
+const routes = (
+  <Switch> 
+    <Route exact path="/">
+      <Landing />
+    </Route>
+    <Route path="/error">
+      <Error />
+    </Route>
+  </Switch>
+)
+export default routes;
+
+
+
+Materia UI media queries:
+------------------------
+
+const isSmallMobile = useMediaQuery(theme.breakpoints.down("xs"));
+const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
